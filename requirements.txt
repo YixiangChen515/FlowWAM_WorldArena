@@ -1,0 +1,19 @@
+# Install torch/torchvision separately based on your CUDA driver.
+# See README "Environment Setup" for recommended cu124 command.
+transformers
+imageio
+imageio[ffmpeg]
+safetensors
+einops
+sentencepiece
+protobuf
+modelscope
+ftfy
+pynvml
+accelerate
+peft
+opencv-python
+h5py
+pyyaml
+sapien
+numpy<2

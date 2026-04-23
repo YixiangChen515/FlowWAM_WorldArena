@@ -1,0 +1,56 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+.installed.cfg
+build/
+dist/
+develop-eggs/
+.eggs/
+
+# ===== Model weights / checkpoints =====
+*.safetensors
+*.pth
+*.pt
+*.ckpt
+*.bin
+
+# ===== Videos =====
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+
+# ===== Data files =====
+*.npy
+*.npz
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.zarr
+*.zip
+
+# ===== Logs =====
+swanlog/
+wandb/
+
+# ===== OS / IDE =====
+.DS_Store
+.vscode/
+.cursor/
+
+# ===== Environments =====
+.env
+.venv
+env/
+venv/
+
+# ===== Model directories =====
+inference/models/Wan-AI/
+inference/embodiments/
+inference/FlowWAM_eval/

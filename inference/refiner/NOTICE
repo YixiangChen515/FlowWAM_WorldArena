@@ -1,0 +1,31 @@
+FlowWAM Refiner — Third-Party Notice
+====================================
+
+The contents of this directory (`inference/refiner/`) include source code
+from the SeedVR2 video super-resolution model, originally released by
+ByteDance Ltd. and/or its affiliates:
+
+    SeedVR / SeedVR2
+    Copyright (c) 2025 Bytedance Ltd. and/or its affiliates
+    Licensed under the Apache License, Version 2.0
+    https://github.com/ByteDance-Seed/SeedVR
+
+The full upstream Apache-2.0 license text is reproduced verbatim in
+`LICENSE_SeedVR`. Original copyright headers in vendored source files
+under `SeedVR/` are preserved unmodified.
+
+The pretrained checkpoints used by the refiner — `seedvr2_ema_3b.pth`
+and `ema_vae.pth` — are the official SeedVR2-3B weights released at
+https://huggingface.co/ByteDance-Seed/SeedVR2-3B. They are not modified
+or redistributed by this repository; users download them directly from
+the upstream source (see the project README).
+
+Modifications introduced in this distribution
+---------------------------------------------
+- The upstream source tree was vendored into `SeedVR/` with binary
+  checkpoints, `.git/`, `__pycache__/`, and pre-built wheels removed.
+- A thin Python wrapper (`runtime.py`) was added to load the model once
+  and process per-clip numpy buffers in memory.
+- A pure-function temporal blending utility (`temporal_blend.py`) was
+  added to combine refined frames with the upstream FlowWAM output.
+- No source file under `SeedVR/` has been modified.
