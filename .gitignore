@@ -14,7 +14,7 @@ develop-eggs/
 # ===== Model weights / checkpoints =====
 *.safetensors
 *.pth
-*.pt
+# *.pt
 *.ckpt
 *.bin
 
