@@ -54,3 +54,9 @@ venv/
 inference/models/Wan-AI/
 inference/embodiments/
 inference/FlowWAM_eval/
+training/models/
+
+# ===== Local debug (not for release) =====
+training/debug_train.sh
+
+temp/

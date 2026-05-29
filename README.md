@@ -10,19 +10,28 @@ FlowWAM_WorldArena/
 ├── requirements.txt
 ├── setup.py
 ├── LICENSE
-├── diffsynth/                          # Trimmed diffusion library (Wan-only)
-└── inference/
-    ├── world_model_inference.sh        # Main entry point
-    ├── world_model_inference.py        # Inference pipeline
-    ├── dataset_world_robotwin.py       # RoboTwin dataset loader
+├── diffsynth/                          # Trimmed diffusion library (Wan + trainers)
+├── inference/
+│   ├── world_model_inference.sh        # Main entry point
+│   ├── world_model_inference.py        # Inference pipeline
+│   ├── dataset_world_robotwin.py       # RoboTwin dataset loader
+│   ├── reversible_flow_codec.py        # Flow encode / decode
+│   ├── video_flow_codec_pipeline.py    # Flow extraction pipeline
+│   ├── robot_only_renderer.py          # SAPIEN robot-only renderer
+│   ├── generate_summary.py             # Post-inference summary
+│   ├── action_triplets.json            # Cross-episode action mapping
+│   ├── embodiments/                    # Robot URDF configs (download below)
+│   ├── refiner/                        # Inline post-processing module
+│   └── models/                         # Model checkpoints (download below)
+└── training/
+    ├── world_model_train.sh            # Training entry point
+    ├── world_model_train.py            # Training loop (accelerate + swanlab)
+    ├── world_model_module.py           # Dual-stream world model module
+    ├── dataset.py                      # RoboTwin training dataset
+    ├── sampler.py                      # DDP rollout-aware bucket sampler
+    ├── dataset_world_robotwin.py       # Shared RoboTwin helpers
     ├── reversible_flow_codec.py        # Flow encode / decode
-    ├── video_flow_codec_pipeline.py    # Flow extraction pipeline
-    ├── robot_only_renderer.py          # SAPIEN robot-only renderer
-    ├── generate_summary.py             # Post-inference summary
-    ├── action_triplets.json            # Cross-episode action mapping
-    ├── embodiments/                    # Robot URDF configs (download below)
-    ├── refiner/                        # Inline post-processing module
-    └── models/                         # Model checkpoints (download below)
+    └── video_flow_codec_pipeline.py    # Flow extraction pipeline
 ```
 
 ## Environment Setup
@@ -110,6 +119,65 @@ inference/FlowWAM_eval/
 ├── FlowWAM_test_2/         # Variant 2 (cross-action)
 └── summary.json            # Aggregated results
 ```
+
+## Training
+
+The training code lives in `training/` and is self-contained: it reuses the
+same trimmed `diffsynth` library (with `diffsynth/trainers/`) and the Wan base
+models downloaded for inference.
+
+### Data layout
+
+Training reads RoboTwin HDF5 episodes from two roots:
+
+- A high-resolution root (`--dataset_base_path`) providing supervision frames
+  and robot-only frames (for optical flow).
+- A low-resolution root (`--low_res_data_root`) providing the conditioning
+  reference frame, which is BICUBIC-upsampled to match the inference-time
+  degradation.
+
+Each root follows the standard RoboTwin layout:
+
+```
+<data_root>/<task>/<variant>/
+├── data/episode*.hdf5                  # scene RGB (observation/<camera>/rgb)
+├── robot_only/data/episode*.hdf5       # robot-only RGB (used for flow)
+└── instructions/episode*.json          # language instructions (optional)
+```
+
+### Models
+
+Training fine-tunes the `Wan2.2-TI2V-5B` backbone. Reuse the base models
+downloaded in "Model & Data Download"; `world_model_train.sh` symlinks them
+into `training/models/` automatically:
+
+```bash
+ln -sfn ../inference/models/Wan-AI training/models/Wan-AI
+```
+
+### Launch
+
+Edit `DATASET_BASE_PATH` / `LOW_RES_DATA_ROOT` (and, for multi-node,
+`NUM_MACHINES` / `MASTER_ADDR` / `MASTER_PORT`) at the top of
+`training/world_model_train.sh`, then:
+
+```bash
+cd training
+
+# optional: enable swanlab logging
+export SWANLAB_API_KEY=...
+
+# Single node, all visible GPUs
+bash world_model_train.sh
+
+# Multi-node: run on every node with matching NUM_MACHINES / MASTER_ADDR
+bash world_model_train.sh --machine_rank 0   # master
+bash world_model_train.sh --machine_rank 1   # worker 1
+```
+
+Checkpoints are written under `OUTPUT_PATH` (default `training/models/train/...`)
+every `SAVE_EVERY_N_EPOCHS` epochs. To resume, set `RESUME_CHECKPOINT` to a
+saved `epoch-N.safetensors`.
 
 ## Third-party components
 

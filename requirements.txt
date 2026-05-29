@@ -16,4 +16,7 @@ opencv-python
 h5py
 pyyaml
 sapien
+tqdm
+pandas
+swanlab
 numpy<2
