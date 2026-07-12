@@ -75,7 +75,7 @@ hf download Wan-AI/Wan2.1-T2V-1.3B \
     --local-dir inference/models/Wan-AI/Wan2.1-T2V-1.3B
 
 # 2. FlowWAM checkpoint
-hf download YixiangChen/FlowWAM flowwam_stage1.safetensors \
+hf download YixiangChen/FlowWAM flowwam_worldarena_stage1.safetensors \
     --local-dir inference/models/stage_1/
 
 # 3. Refiner checkpoints

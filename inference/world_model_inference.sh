@@ -39,7 +39,7 @@ export PYTHONWARNINGS="ignore::UserWarning"
 #  Inference configuration
 # ============================================================
 MODEL_NAME="FlowWAM"
-FULL_PATH="${SCRIPT_DIR}/models/stage_1/flowwam_stage1.safetensors"
+FULL_PATH="${SCRIPT_DIR}/models/stage_1/flowwam_worldarena_stage1.safetensors"
 
 # embodiments/ should be in this directory (see README for download instructions)
 EMBODIMENT_DIR="${SCRIPT_DIR}"
