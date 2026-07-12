@@ -80,12 +80,10 @@ LOW_RES_DATA_ROOT="/path/to/robotwin/dataset_lowres"    # lo-res conditioning fr
 
 MODEL_PATHS="Wan-AI/Wan2.2-TI2V-5B:diffusion_pytorch_model*.safetensors,Wan-AI/Wan2.2-TI2V-5B:models_t5_umt5-xxl-enc-bf16.pth,Wan-AI/Wan2.2-TI2V-5B:Wan2.2_VAE.pth"
 
-# VARIANT: bash array; all listed variants are scanned per task and their
-# episodes are concatenated into one flat sample list. Tasks missing a variant
-# are silently skipped.
-#   Single-variant: VARIANT=("aloha-agilex_clean_50")
-#   Multi-variant:  VARIANT=("aloha-agilex_clean_50" "new_clean")
-VARIANT=("aloha-agilex_clean_50" "new_clean")
+# VARIANT: the variant subdir name under each task directory
+# (<data_root>/<task>/<variant>/). The released FlowWAM_WorldArena dataset
+# ships a single clean variant per task.
+VARIANT=("aloha-agilex_clean_50")
 CAMERA="head_camera"
 
 NUM_FRAMES=121

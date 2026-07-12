@@ -1,6 +1,6 @@
 #!/bin/bash
 # FlowWAM world model inference for WorldArena evaluation.
-# Runs 3 instruction variants (0, 1, 2) and generates summary.json.
+# Runs the original instruction variant (0) and generates summary.json.
 #
 # Usage:
 #   bash world_model_inference.sh <test_dataset_dir> [gpu_ids]
@@ -92,64 +92,43 @@ if [[ ! -f "${FULL_PATH}" ]]; then
   exit 1
 fi
 
-TRIPLET_JSON="${SCRIPT_DIR}/action_triplets.json"
+INSTR_VARIANT=0
 
-for INSTR_VARIANT in 0 1 2; do
-  INSTR_LABEL="instructions"
-  [[ ${INSTR_VARIANT} -gt 0 ]] && INSTR_LABEL="instructions_${INSTR_VARIANT}"
-  DIR_SUFFIX="${MODEL_NAME}_test"
-  [[ ${INSTR_VARIANT} -gt 0 ]] && DIR_SUFFIX="${MODEL_NAME}_test_${INSTR_VARIANT}"
+echo ""
+echo ">>>>>> Instruction variant ${INSTR_VARIANT} -> ${MODEL_NAME}_test/"
+echo ""
 
-  CROSS_ACTION_ARGS=""
-  if [[ ${INSTR_VARIANT} -gt 0 ]]; then
-    if [[ -f "${TRIPLET_JSON}" ]]; then
-      CROSS_ACTION_ARGS="--triplet_json ${TRIPLET_JSON} --triplet_variant ${INSTR_VARIANT}"
-    else
-      CROSS_ACTION_ARGS="--cross_episode_action --action_shuffle_seed $((42 + INSTR_VARIANT))"
-    fi
-  fi
+accelerate launch \
+    --num_processes=${NUM_GPUS} \
+    --num_machines=1 \
+    "${SCRIPT_DIR}/world_model_inference.py" \
+    --test_dataset_dir "${TEST_DATASET_DIR}" \
+    --embodiment_dir "${EMBODIMENT_DIR}" \
+    --variant "${VARIANT}" \
+    --output_dir "${OUTPUT_DIR}" \
+    --model_name "${MODEL_NAME}" \
+    --full_path "${FULL_PATH}" \
+    --instruction_variant ${INSTR_VARIANT} \
+    --num_output_frames ${NUM_OUTPUT_FRAMES} \
+    --size ${SIZE_W} ${SIZE_H} \
+    --fps ${FPS} \
+    --camera ${CAMERA} \
+    --flow_method ${FLOW_METHOD} \
+    --flow_device ${FLOW_DEVICE} \
+    --flow_max_magnitude ${FLOW_MAX_MAGNITUDE} \
+    --flow_resolution ${FLOW_RES_W} ${FLOW_RES_H} \
+    --robot_render_resolution ${RENDER_RES_W} ${RENDER_RES_H} \
+    --max_stride ${MAX_STRIDE} \
+    --max_rollouts ${MAX_ROLLOUTS} \
+    --num_inference_steps ${NUM_INFERENCE_STEPS} \
+    --sigma_shift ${SIGMA_SHIFT} \
+    --seed ${SEED} \
+    --num_workers ${NUM_WORKERS} \
+    ${MAX_EPISODES:+--max_episodes "${MAX_EPISODES}"} \
+    ${EPISODES:+--episodes ${EPISODES}}
 
-  echo ""
-  echo ">>>>>> Action Following variant ${INSTR_VARIANT}: ${INSTR_LABEL} -> ${DIR_SUFFIX}/"
-  [[ -n "${CROSS_ACTION_ARGS}" ]] && echo "       ${CROSS_ACTION_ARGS}"
-  echo ""
-
-  accelerate launch \
-      --num_processes=${NUM_GPUS} \
-      --num_machines=1 \
-      "${SCRIPT_DIR}/world_model_inference.py" \
-      --test_dataset_dir "${TEST_DATASET_DIR}" \
-      --embodiment_dir "${EMBODIMENT_DIR}" \
-      --variant "${VARIANT}" \
-      --output_dir "${OUTPUT_DIR}" \
-      --model_name "${MODEL_NAME}" \
-      --full_path "${FULL_PATH}" \
-      --instruction_variant ${INSTR_VARIANT} \
-      --num_output_frames ${NUM_OUTPUT_FRAMES} \
-      --size ${SIZE_W} ${SIZE_H} \
-      --fps ${FPS} \
-      --camera ${CAMERA} \
-      --flow_method ${FLOW_METHOD} \
-      --flow_device ${FLOW_DEVICE} \
-      --flow_max_magnitude ${FLOW_MAX_MAGNITUDE} \
-      --flow_resolution ${FLOW_RES_W} ${FLOW_RES_H} \
-      --robot_render_resolution ${RENDER_RES_W} ${RENDER_RES_H} \
-      --max_stride ${MAX_STRIDE} \
-      --max_rollouts ${MAX_ROLLOUTS} \
-      --num_inference_steps ${NUM_INFERENCE_STEPS} \
-      --sigma_shift ${SIGMA_SHIFT} \
-      --seed ${SEED} \
-      --num_workers ${NUM_WORKERS} \
-      ${MAX_EPISODES:+--max_episodes "${MAX_EPISODES}"} \
-      ${EPISODES:+--episodes ${EPISODES}} \
-      ${CROSS_ACTION_ARGS}
-
-  echo ""
-  echo "<<<<<< Finished variant ${INSTR_VARIANT}"
-  echo ""
-done
-
-echo "All 3 instruction variants completed."
+echo ""
+echo "<<<<<< Finished variant ${INSTR_VARIANT}"
 
 echo ""
 echo ">>>>>> Generating summary.json ..."

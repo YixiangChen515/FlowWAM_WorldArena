@@ -17,9 +17,6 @@ then be passed to WorldArena evaluation scripts:
 
     # VLM judge (Interaction Quality, Perspectivity, Instruction Following)
     bash run_VLM_judge.sh MODEL_NAME {eval_dir}/{model}_test {eval_dir}/summary.json
-
-    # Action Following (needs _test, _test_1, _test_2)
-    bash run_action_following.sh MODEL_NAME {eval_dir}/{model}_test {eval_dir}/summary.json
 """
 
 import argparse
@@ -64,14 +61,10 @@ def main():
         return
 
     video_dir = os.path.join(eval_dir, f"{model_name}_test")
-    video_dir_1 = os.path.join(eval_dir, f"{model_name}_test_1")
-    video_dir_2 = os.path.join(eval_dir, f"{model_name}_test_2")
 
     if not os.path.isdir(video_dir):
         print(f"ERROR: video directory not found: {video_dir}")
         return
-
-    has_action_following = os.path.isdir(video_dir_1) and os.path.isdir(video_dir_2)
 
     first_frame_dir = os.path.join(
         args.test_dataset_dir, "first_frame", "fixed_scene_task")
@@ -119,9 +112,6 @@ def main():
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
 
-    n_v1 = len(glob.glob(os.path.join(video_dir_1, "episode*.mp4"))) if has_action_following else 0
-    n_v2 = len(glob.glob(os.path.join(video_dir_2, "episode*.mp4"))) if has_action_following else 0
-
     print(f"=== Summary Generation Complete ===")
     print(f"  model_name:    {model_name}")
     print(f"  eval_dir:      {eval_dir}")
@@ -132,11 +122,6 @@ def main():
     if missing_instr:
         print(f"  WARNING:       {missing_instr} episodes missing instruction")
 
-    print(f"\n=== Variant Status ===")
-    print(f"  {model_name}_test:    {len(video_files)} videos")
-    print(f"  {model_name}_test_1:  {n_v1} videos {'OK' if n_v1 else 'MISSING'}")
-    print(f"  {model_name}_test_2:  {n_v2} videos {'OK' if n_v2 else 'MISSING'}")
-
     print(f"\n=== Available Evaluations ===")
     print(f"  Standard metrics (no GT needed):")
     print(f"    cd /path/to/WorldArena/video_quality")
@@ -146,14 +131,6 @@ def main():
     print()
     print(f"  VLM Judge (Interaction Quality, Perspectivity, Instruction Following):")
     print(f"    bash run_VLM_judge.sh {model_name} {video_dir} {output_path}")
-
-    if has_action_following:
-        print()
-        print(f"  Action Following (3 variants detected):")
-        print(f"    bash run_action_following.sh {model_name} {video_dir} {output_path}")
-    else:
-        print()
-        print(f"  Action Following: UNAVAILABLE (need _test_1 and _test_2)")
 
     print()
     print(f"  Metrics needing GT video (Depth/Trajectory/Semantic/JEPA): "

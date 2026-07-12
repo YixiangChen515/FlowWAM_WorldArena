@@ -145,9 +145,8 @@ if __name__ == "__main__":
              "(<data_root>/<task>/<variant>/). All listed variants are "
              "scanned per task and their episodes are concatenated into a "
              "single flat sample list. Tasks that don't have a given variant "
-             "on disk are silently skipped, so it's safe to pass a variant "
-             "that is still being generated for some tasks. "
-             "Example: --variant aloha-agilex_clean_50 new_clean",
+             "on disk are silently skipped. "
+             "Example: --variant aloha-agilex_clean_50",
     )
     parser.add_argument("--camera", type=str, default="head_camera")
     parser.add_argument(
