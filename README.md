@@ -226,3 +226,19 @@ saved `epoch-N.safetensors`.
 Apache-2.0 license. See `inference/refiner/LICENSE_SeedVR` for the full
 license text and `inference/refiner/NOTICE` for attribution and a list
 of modifications.
+
+
+## Citation
+
+```bibtex
+@misc{flowwam,
+      title={FlowWAM: Optical Flow as a Unified Action Representation for World Action Models}, 
+      author={Yixiang Chen and Peiyan Li and Yuan Xu and Qisen Ma and Jiabing Yang and Kai Wang and Jianhua Yang and Dong An and He Guan and Gaoteng Liu and Jianlou Si and Jun Huang and Jing Liu and Nianfeng Liu and Yan Huang and Liang Wang},
+      year={2026},
+      eprint={2607.13017},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2607.13017}, 
+}
+```
+
